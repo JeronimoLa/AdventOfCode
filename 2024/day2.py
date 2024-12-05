@@ -1,88 +1,49 @@
 import time 
 
 
-
-def magic(unknown_status: list):
-# print (unknown_status)
-    decreasing = True
-    increasing = True
+def magic(unknown_status: list)-> str:
 
     previous_status = None
-    for unknown in range(len(unknown_status)-1):
-        print(f"first index: {unknown_status[unknown]} second index: {unknown_status[unknown+1]}")
-        if int(unknown_status[unknown]) > int(unknown_status[unknown+1]):
-            level = int(unknown_status[unknown]) - int(unknown_status[unknown+1])
-            print(level)
-            if int(unknown_status[unknown]) > int(unknown_status[unknown+1]):
-                current_status = decreasing
-            else:
-                current_status = increasing
+    for index, current in enumerate(unknown_status[:-1]):
+        next_value = unknown_status[index + 1]
 
-            if previous_status == None:
-                if level > 0 and level <= 3:
-                    previous_status = current_status
-                    continue 
-                else:
-                    return f"UNSAFE 1: {list (unknown_status)}"
+        if current == next_value:
+            return "UNSAFE"
 
-            if previous_status == current_status:
-                if level > 0 and level <= 3:
-                    previous_status = current_status
-                    continue 
-                else:
-                    return f"UNSAFE 2: {list(unknown_status)}"
-            else:
-                return f"UNSAFE 3: {list(unknown_status)}"
-
-        elif int(unknown_status[unknown]) < int(unknown_status[unknown+1]):
-            # return f"UNSAFE 4: (list(unknown_status)}"
-            level = int(unknown_status[unknown+1]) - int(unknown_status[unknown])
-            if int(unknown_status[unknown+1]) < int(unknown_status[unknown]):
-                current_status = increasing
-            else:
-                current_status = False
-
-            if previous_status == None:
-                if level > 0 and level <= 3:
-                    previous_status = current_status
-                    continue
-                else:
-                    return f"UNSAFE 4: {list(unknown_status)}"
-            if previous_status == current_status:
-                if level >= 1 and level <= 3:
-                    previous_status = current_status
-                    continue 
-                else:
-                    return f"UNSAFE 5: {list (unknown_status)}"
-            else:
-                return f"UNSAFE 6: {list (unknown_status)}"
+        if current > next_value:
+            current_status = "decreasing"
+            level = current - next_value
+        elif current < next_value:
+            current_status = "increasing"
+            level = next_value - current
         else:
-            return f"UNSAFE 7: {list (unknown_status)}"
+            current_status = "unchanged"
+        
+        if level < 0 or level > 3:
+            return "UNSAFE"
 
+        if previous_status is not None and current_status != previous_status:
+            return f"UNSAFE: Status changed from {previous_status} to {current_status} at index {index}"
+        
+        previous_status = current_status
 
+    return "SAFE"
 
 def main():
     with open("data/2.txt") as f:
         my_list = f.read().splitlines()
         all_things = [ item.split() for item in my_list ]
 
-
-
-
         counter = 0
         i = 0
         while len(all_things) > i:
-            unknown_status = all_things[i]
+            unknown_status = list(map(int, all_things[i]))
             condition = magic(unknown_status)
-            if condition is None:
+            if condition == "SAFE":
                 counter+=1
             # print(condition)
             i += 1
         print(f"COUNT: {counter}")
 
-
 if __name__ == "__main__":
     main()
-
-
-    # 261
